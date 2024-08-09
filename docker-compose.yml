@@ -1,0 +1,47 @@
+version: "3.8"
+
+services:
+  rabbitmq1:
+    image: rabbitmq:3-management
+    hostname: rabbitmq1
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_ERLANG_COOKIE=SWQOKODSQALRPCLNMEQG
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=adminpassword
+    networks:
+      - rabbitmq_net
+
+  rabbitmq2:
+    image: rabbitmq:3-management
+    hostname: rabbitmq2
+    ports:
+      - "5673:5672"
+      - "15673:15672"
+    environment:
+      - RABBITMQ_ERLANG_COOKIE=SWQOKODSQALRPCLNMEQG
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=adminpassword
+    networks:
+      - rabbitmq_net
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - RABBITMQ_HOSTS=rabbitmq1:5672,rabbitmq2:5672
+      - RABBITMQ_USERNAME=admin
+      - RABBITMQ_PASSWORD=adminpassword
+      - RABBITMQ_VHOST=/
+    depends_on:
+      - rabbitmq1
+      - rabbitmq2
+    networks:
+      - rabbitmq_net
+
+networks:
+  rabbitmq_net:
+    driver: bridge
