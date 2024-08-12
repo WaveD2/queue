@@ -11,6 +11,8 @@ services:
       - RABBITMQ_ERLANG_COOKIE=SWQOKODSQALRPCLNMEQG
       - RABBITMQ_DEFAULT_USER=admin
       - RABBITMQ_DEFAULT_PASS=adminpassword
+    volumes:
+      - rabbitmq1_data:/var/lib/rabbitmq
     networks:
       - rabbitmq_net
 
@@ -24,6 +26,23 @@ services:
       - RABBITMQ_ERLANG_COOKIE=SWQOKODSQALRPCLNMEQG
       - RABBITMQ_DEFAULT_USER=admin
       - RABBITMQ_DEFAULT_PASS=adminpassword
+    volumes:
+      - rabbitmq2_data:/var/lib/rabbitmq
+    networks:
+      - rabbitmq_net
+
+  rabbitmq3:
+    image: rabbitmq:3-management
+    hostname: rabbitmq3
+    ports:
+      - "5674:5672"
+      - "15674:15672"
+    environment:
+      - RABBITMQ_ERLANG_COOKIE=SWQOKODSQALRPCLNMEQG
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=adminpassword
+    volumes:
+      - rabbitmq3_data:/var/lib/rabbitmq
     networks:
       - rabbitmq_net
 
@@ -32,16 +51,22 @@ services:
       context: .
       dockerfile: Dockerfile
     environment:
-      - RABBITMQ_HOSTS=rabbitmq1:5672,rabbitmq2:5672
+      - RABBITMQ_HOSTS=rabbitmq1:5672,rabbitmq2:5673,rabbitmq3:5674
       - RABBITMQ_USERNAME=admin
       - RABBITMQ_PASSWORD=adminpassword
       - RABBITMQ_VHOST=/
     depends_on:
       - rabbitmq1
       - rabbitmq2
+      - rabbitmq3
     networks:
       - rabbitmq_net
 
 networks:
   rabbitmq_net:
     driver: bridge
+
+volumes:
+  rabbitmq1_data:
+  rabbitmq2_data:
+  rabbitmq3_data:
