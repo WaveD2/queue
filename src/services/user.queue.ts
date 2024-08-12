@@ -20,7 +20,7 @@ export const userTaskV2Queue = {
         await withRetry(async () => {
             try {
                 await rb.channel.assertQueue('user_queue', { durable: true });
-                await rb.channel.consume('user_queue', async (msg) => {
+                await rb.channel.consume('user_queue', async (msg: any) => {
                     if (msg) {
                         try {
                             const data = JSON.parse(msg.content.toString());

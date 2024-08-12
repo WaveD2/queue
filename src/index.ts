@@ -10,7 +10,6 @@ async function main() {
 
         userTaskV2Queue.listenerQueue()
 
-
         for (let index = 0; index < 100; index++) {
             const fakeParams = {
                 userId: `user ${index}`,
