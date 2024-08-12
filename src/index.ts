@@ -1,17 +1,35 @@
-import { connect } from './core/rabbitmq';
-import { startConsumers } from './services/consumer';
-import { sendSampleData, startContinuousSending } from './services/producer';
+import { rb } from './core/rabbitmq';
 import logger from './core/logger';
+import { userTaskV2Queue } from './services/user.queue';
+
 
 async function main() {
     try {
-        await connect();
-        // cau hinh producer/consumer
-        await sendSampleData();
-        await startConsumers();
+        await rb.setupConnection();
 
-        // Bắt đầu gửi dữ liệu liên tục
-        startContinuousSending(5000); // Gửi mỗi 5 giây
+
+        userTaskV2Queue.listenerQueue()
+
+
+        for (let index = 0; index < 100; index++) {
+            const fakeParams = {
+                userId: `user ${index}`,
+                task: {
+                    labelId: `label ${index}`,
+                    product: {
+                        id: `product ${index}`,
+                        name: `Product- ${index}`,
+                    },
+                    status: index,
+                },
+            };
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            await userTaskV2Queue.sendLabelTaskToChecking({ data: fakeParams, options: { persistent: true } });
+            // if (index === 30) {
+            //     await rb.switchConnection();
+            // }
+        }
+
 
     } catch (error) {
         logger.error('An error occurred:', error);

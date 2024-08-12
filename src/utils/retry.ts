@@ -22,5 +22,5 @@ export async function withRetry<T>(
             }
         }
     }
-    throw lastError || new Error('All retry attempts failed');
+    throw lastError || new Error('All retry max 3');
 }

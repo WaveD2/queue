@@ -1,0 +1,18 @@
+Nếu cấu hình mirrored queues hoặc quorum queues giữa các cluster, dữ liệu sẽ được bảo toàn trên các cluster còn lại. Yeu tien cau hinh quorum queues
+Đối với các message đã được xác nhận (ack) trước khi cluster chết, chúng sẽ được bảo toàn trên các cluster còn lại nếu đã được đồng bộ.
+Các message chưa được xác nhận có thể bị mất nếu chúng chỉ tồn tại trên cluster đã chết và chưa kịp đồng bộ.
+
+Khôi phục và đồng bộ sau khi cluster được khôi phục:
+Khi cluster đã chết được khôi phục, nó sẽ cần phải đồng bộ lại với các cluster khác trong hệ thống.
+Quá trình này thường được thực hiện tự động bởi RabbitMQ, nhưng có thể mất một khoảng thời gian tùy thuộc vào lượng dữ liệu cần đồng bộ.
+
+Ảnh hưởng đến các giao dịch đang diễn ra:
+Các giao dịch chưa hoàn thành trên cluster đã chết sẽ bị hủy bỏ.
+Điều này thường bao gồm việc triển khai cơ chế retry, circuit breaker, và có thể là cơ chế ghi nhật ký giao dịch để đảm bảo không mất dữ liệu quan trọng.
+
+
+
+1.Xung đột dữ liệu:
+Tập tin lưu trữ chung: RabbitMQ lưu trữ dữ liệu, queue, và trạng thái node trong thư mục /var/lib/rabbitmq. Nếu ba nodes cùng ghi vào một thư mục này, bạn sẽ gặp phải xung đột và lỗi dữ liệu. Các nodes sẽ không thể phân biệt được đâu là dữ liệu của mình, dẫn đến việc mất mát dữ liệu và khả năng hoạt động không ổn định.
+2. Không thể đồng bộ:
+Quản lý trạng thái: RabbitMQ cần theo dõi trạng thái của từng node trong cluster. Nếu các nodes đều sử dụng cùng một volume, việc đồng bộ hóa và quản lý trạng thái sẽ trở nên phức tạp, dẫn đến rối loạn trong hoạt động của cluster.
