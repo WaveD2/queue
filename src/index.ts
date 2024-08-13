@@ -1,6 +1,6 @@
+import { userTaskV2Queue } from './services/user.queue';
 import { rb } from './core/rabbitmq';
 import logger from './core/logger';
-import { userTaskV2Queue } from './services/user.queue';
 
 
 async function main() {
@@ -24,9 +24,6 @@ async function main() {
             };
             await new Promise(resolve => setTimeout(resolve, 1500));
             await userTaskV2Queue.sendLabelTaskToChecking({ data: fakeParams, options: { persistent: true } });
-            // if (index === 30) {
-            //     await rb.switchConnection();
-            // }
         }
 
 
